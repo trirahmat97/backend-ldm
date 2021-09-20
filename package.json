@@ -1,0 +1,31 @@
+{
+  "name": "backend-ldm",
+  "version": "1.0.0",
+  "description": "backend aplikasi ldm lampung",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riohermawan10/backend-ldm.git"
+  },
+  "author": "Rio Hermawan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/riohermawan10/backend-ldm/issues"
+  },
+  "homepage": "https://github.com/riohermawan10/backend-ldm#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.2",
+    "mysql2": "^2.2.5",
+    "nodemon": "^2.0.12",
+    "sequelize": "^5.22.4"
+  }
+}
