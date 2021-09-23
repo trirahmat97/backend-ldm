@@ -14,8 +14,9 @@ router.get('/detail/detailJob', JobController.findAllDetailJob);
 router.get('/detail/detailJob/:id', JobController.findAllDetailJobById);
 
 router.post('/addProducttoJob', JobController.addProducttoJob);
-router.delete('/deleteProducttoJob/:id', JobController.deleteProducttoJob);
+// router.delete('/deleteProducttoJob/:id', JobController.deleteProducttoJob);
 router.delete('/deleteUsertoJob/:id', JobController.deleteUsertoJob);
 router.delete('/deleteProductToJobById/:id', JobController.deleteProductToJob2);
+router.patch('/editProductToJob', JobController.editProductToJob);
 
 module.exports = router;

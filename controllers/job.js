@@ -221,16 +221,31 @@ exports.sendJob = async (req, res) =>{
 exports.sendProduct = async (req, res) =>{
     try{
         const { products, jobId, jumlah, keterangan, lokasi_pemasangan } = req.body;
-        const findJob = await Job.findByPk(jobId);
+        const findJob = await Job.findOne({
+            where: { id: jobId },
+            include: [{
+                model: Product,
+                attributes: ['id', 'title',],
+                through: { attributes: ['lokasi_pemasangan', 'keterangan', 'jumlah', 'productId'] }
+              }]
+        });
         if(!findJob){
             res.status(200).json(response.nodeFound('Job Not Found!'));
         }
         const findProduct = await Product.findAll({ where: { id: { [Op.in]: products } } });
         if (findProduct.length > 0) {
+            if(jumlah > findProduct[0].stock){
+               return res.status(200).json(response.bad('Jumlah Product Melampaui Stock!'))
+            }
             await findJob.addProduct(findProduct, 
                 { through: { 
                     jumlah, keterangan, lokasi_pemasangan
-                } });
+                } 
+            });
+            await findProduct[0].update({
+                stock: findProduct[0].stock - jumlah,
+                totalOut: findProduct[0].totalOut + jumlah
+            });
         }
         const productJobResult = await Job.findOne({
             where: { id: findJob.id },
@@ -324,7 +339,7 @@ exports.deleteProducttoJob = async (req, res) => {
        const id = req.params.id
        const findjobProduct = await JobProduct.findByPk(id);
         if(!findjobProduct){
-            res.status(200).json(response.nodeFound('Job Product Not Found!'));
+            return res.status(200).json(response.nodeFound('Job Product Not Found!'));
         }
         const deleteProducttoJob = await findjobProduct.destroy();
         if (deleteProducttoJob) {
@@ -341,7 +356,7 @@ exports.deleteUsertoJob = async (req, res) => {
        const id = req.params.id
        const findjobUser = await UserJob.findOne({where: {userId : id}});
         if(!findjobUser){
-            res.status(200).json(response.nodeFound('Job User Not Found!'));
+            return res.status(200).json(response.nodeFound('Job User Not Found!'));
         }
         const deleteUsertoJob = await findjobUser.destroy();
         if (deleteUsertoJob) {
@@ -357,15 +372,64 @@ exports.deleteProductToJob2 = async (req, res) => {
     try {
        const id = req.params.id
        const findProductJob = await ProductJob.findOne({where: {productId : id}});
+       const findProduct = await Product.findOne({where: {id: findProductJob.productId}});
+        if(!findProduct){
+            return res.status(200).json(response.nodeFound('Product Not Found!'));
+        }
         if(!findProductJob){
-            res.status(200).json(response.nodeFound('Job Product Not Found!'));
+            return res.status(200).json(response.nodeFound('Job Product Not Found!'));
         }
         const deleteProducttoJob = await findProductJob.destroy();
         if (deleteProducttoJob) {
+            await findProduct.update({
+                stock: findProduct.stock + findProductJob.jumlah,
+                totalOut: findProduct.totalOut - findProductJob.jumlah
+            });
             res.status(200).json(response.okDelete(message.delete));
         }
     }
     catch (err) {
+        res.status(200).json(response.bad(err.message));
+    }
+}
+
+//editProductToJob
+exports.editProductToJob = async (req, res) => {
+    try {
+        const {productId, jobId, jumlah, keterangan, lokasi_pemasangan} = req.body;
+        const findProductJob = await ProductJob.findOne({where: {productId, jobId}});
+        const findProduct = await Product.findByPk(productId);
+        if(!findProduct){
+            return res.status(200).json(response.nodeFound('Product Not Found!'));
+        }
+        if(!findProductJob){
+            return res.status(200).json(response.nodeFound('Job Product Not Found!'));
+        }
+        if(jumlah > findProduct.stock){
+            return res.status(200).json(response.bad('Jumlah Product Melampaui Stock!'))
+        }
+
+        //input: 15  | result: 5 | stock: 90 - 5 = 85 | 85 
+        let stockResult = 0;
+        let totalOutResult = 0;
+        if(jumlah === findProductJob.jumlah){
+            stockResult = findProduct.stock;
+            totalOutResult = findProduct.totalOut;
+        }else{
+            stockResult = (findProduct.stock + findProductJob.jumlah) - jumlah;
+            totalOutResult = (findProduct.totalOut - findProductJob.jumlah) + jumlah;
+        }
+        await findProduct.update({
+            stock: stockResult,
+            totalOut: totalOutResult
+        });
+        const resultUpdateProductToJob = await findProductJob.update({
+            jumlah: jumlah ? jumlah : findProductJob.jumlah,
+            keterangan: keterangan ? keterangan : findProductJob.keterangan,
+            lokasi_pemasangan: lokasi_pemasangan ? lokasi_pemasangan : findProductJob.lokasi_pemasangan,
+        });
+        res.status(200).json(response.update(resultUpdateProductToJob,'Update Success!'));
+    }catch(err){
         res.status(200).json(response.bad(err.message));
     }
 }

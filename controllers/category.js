@@ -87,8 +87,6 @@ exports.editCategory = async (req, res) => {
         if (!findCategory) {
             return res.status(200).json(response.nodeFound('Category ' + message.notfound));
         }
-        console.log(parentId);
-        console.log(findCategory.id);
         const updateCategory = await findCategory.update({
             name: name ? name : findCategory.name,
             description: description ? description : findCategory.description,

@@ -19,7 +19,8 @@ const Product = connection.define('product', {
             notEmpty: {
                 msg: 'Please enter price!'
             }
-        }
+        },
+        defaultValue: 0
     },
     thumbnail: DataTypes.STRING,
     thumbnailPath: DataTypes.STRING,
@@ -28,23 +29,23 @@ const Product = connection.define('product', {
     stock: {
         type: DataTypes.INTEGER,
         validate: {
-            isInt: true,
             notEmpty: true,
-        }
+        },
+        defaultValue:0
     },
     totalIn: {
         type: DataTypes.INTEGER,
         validate: {
-            isInt: true,
             notEmpty: true,
-        }
+        },
+        defaultValue: 0
     },
     totalOut: {
         type: DataTypes.INTEGER,
         validate: {
-            isInt: true,
             notEmpty: true,
-        }
+        },
+        defaultValue: 0
     }
 }, {
     timestamps: false
