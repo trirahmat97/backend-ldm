@@ -5,6 +5,8 @@ const User = require('../models/user');
 const Job = require('../models/job');
 const jwt = require('jsonwebtoken');
 
+const config = require('../utils/key');
+
 const getPagination = (page, size) => {
     const limit = size ? +size : 10;
     const offset = page ? page * limit : 0;
@@ -30,14 +32,16 @@ exports.login = async (req, res, next) => {
             res.status(200).json(response.bad('Invalid Username or Password!'));
         }
         const doMatch = await bcrypt.compare(password, user.password);
+        const exp = Math.floor(Date.now() / 1000) + (60 * 60);
         if (doMatch) {
-            const token = jwt.sign({user}, 'tra', {expiresIn: '30000'});
+            const token = jwt.sign({user}, config.secret, {expiresIn: exp});
             const data = {
                 userId: user.id,
                 access_token: token,
                 access_type: 'Bearer',
-                expires: 30000,
-                role: user.level
+                expires: exp,
+                role: user.level,
+                name: user.nama
             }
             return res.status(200).json(response.ok(data, "Login Success!"));
         }

@@ -2,6 +2,8 @@ const Product = require('../models/product');
 const User = require('../models/user');
 const Category = require('../models/category');
 
+const Sequelize = require('sequelize');
+
 const response = require('../utils/response');
 const message = require('../utils/responseMessage');
 const fileDelete = require('../utils/deleteFile');
@@ -33,6 +35,21 @@ exports.fetchAll = async (req, res) => {
         });
         const responseProduct = getPagingData(products, page-1, limit);
         res.status(200).json(response.ok(responseProduct, message.fetch));
+    } catch (err) {
+        res.status(200).json(response.bad(err.message));
+    }
+}
+
+exports.getAll = async (req, res) => {
+    try {
+        const products = await Product.findAll({
+            // attributes: [
+            //     [Sequelize.fn('sum', Sequelize.col('totalIn')), 'totalIn'],
+            //     [Sequelize.fn('sum', Sequelize.col('totalOut')), 'totalOut'],
+            //     [Sequelize.fn('sum', Sequelize.col('price')), 'totalOutNominal']
+            // ]
+        });
+        res.status(200).json(response.ok(products, message.fetch));
     } catch (err) {
         res.status(200).json(response.bad(err.message));
     }
