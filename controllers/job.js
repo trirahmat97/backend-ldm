@@ -75,7 +75,45 @@ exports.findAllJob = async (req, res) => {
             limit,
             offset,
             distinct: true,
-            where: {},
+            where: {
+                status_supervisor: { [Op.ne]: 'Done'},
+                status_teknisi: { [Op.ne]: 'Done'},
+            },
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'nama', 'nomor_telpon', 'email'],
+                    through: { attributes: [] }
+                },
+                {
+                    model: Product,
+                    attributes: ['id', 'title'],
+                    through: { attributes: ['lokasi_pemasangan', 'keterangan', 'jumlah'] }
+                }
+            ],
+            order: [
+                ['id', 'DESC']
+            ],
+        });
+        const responseJob = getPagingData(job, page-1, limit);
+        res.status(200).json(response.ok(responseJob, message.fetch));
+    } catch (err) {
+        res.status(200).json(response.bad(err.message));
+    }
+};
+
+exports.findAllJobReport = async (req, res) => {
+    const { page, size } = req.query;
+    const { limit, offset } = getPagination(page-1, size);
+    try {
+        const job = await Job.findAndCountAll({
+            limit,
+            offset,
+            distinct: true,
+            where: {
+                status_supervisor: { [Op.eq]: 'Done'},
+                status_teknisi: { [Op.eq]: 'Done'},
+            },
             include: [
                 {
                     model: User,
