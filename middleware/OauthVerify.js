@@ -1,49 +1,21 @@
 const jwt = require('jsonwebtoken');
-const config = require('../utils/key');
+const response = require('../utils/response');
 
-exports.verification = () => {
-    return (req, res, next) => {
-        let role = req.body.role;
+exports.verification = async (req, res, next) => {
+    try{
         let tokenWithBearer = req.headers.authorization;
-        if (tokenWithBearer) {
-            let token = tokenWithBearer.split(' ')[1];
-            jwt.verify(token, config.secret, (err, decoded) => {
-                if (err) {
-                    return res.status(401).send({ auth: false, message: 'Token tidak terdaftar' });
-                } else {
-                    if (role == 2) {
-                        req.auth = decoded;
-                        next();
-                    } else {
-                        return res.status(401).send({ auth: false, message: 'Role tidak valid' });
-                    }
-                }
-            })
-        } else {
-            return res.status(401).send({ auth: false, message: 'Token tidak tersedia' });
+        if(!tokenWithBearer){
+            return res.status(401).json(response.auth('Authorization Required!'));
         }
-    }
-}
-
-exports.verification2 = (id) => {
-    return (req, res, next) => {
-        let tokenWithBearer = req.headers.authorization;
-        if (tokenWithBearer) {
-            let token = tokenWithBearer.split(' ')[1];
-            jwt.verify(token, config.secret, (err, decoded) => {
-                if (err) {
-                    return res.status(401).send({ auth: false, message: 'Token tidak terdaftar' });
-                } else {
-                    if (id == 1) {
-                        req.auth = decoded;
-                        next();
-                    } else {
-                        return res.status(401).send({ auth: false, message: 'Role tidak valid' });
-                    }
-                }
-            })
-        } else {
-            return res.status(401).send({ auth: false, message: 'Token tidak tersedia' });
+        let token = tokenWithBearer.split(' ')[1];
+        const decoded = await jwt.verify(token, process.env.secret);
+        if((decoded.user.level !== 'Admin') && (decoded.user.level !== 'Super-Visior') ){
+            res.status(200).json(response.auth('Role Invalid to Access!'));
+        }else{
+            next();
         }
+    }catch(err){
+        // res.status(401).json(response.auth('Invalid Authorization!'));
+        res.status(401).json(response.auth(err.mesage));
     }
 }

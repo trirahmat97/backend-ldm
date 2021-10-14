@@ -1,5 +1,10 @@
 const { DataTypes } = require('sequelize');
 const connection = require('../db/connection');
+const ImageJob = require('./imageJob');
+const Product = require('./product');
+const ProductJob = require('./productJob');
+const UserJob = require('./userJob');
+const User = require('./user');
 const Job = connection.define('job', {
     deskripsi: {
         type: DataTypes.STRING(100),
@@ -60,5 +65,7 @@ const Job = connection.define('job', {
         type: DataTypes.STRING
     }
 });
-
+Job.hasMany(ImageJob);
+Job.belongsToMany(Product, { through: ProductJob });
+Job.belongsToMany(User, { through: UserJob });
 module.exports = Job;

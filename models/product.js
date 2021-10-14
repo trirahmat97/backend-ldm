@@ -1,6 +1,8 @@
 const { DataTypes } = require('sequelize');
 const connection = require('../db/connection');
-
+const Category = require('./category');
+// const Job = require('./job');
+// const ProductJob = require('./productJob');
 const Product = connection.define('product', {
     title: {
         type: DataTypes.STRING,
@@ -50,5 +52,6 @@ const Product = connection.define('product', {
 }, {
     timestamps: false
 });
-
+Product.belongsTo(Category, { onDelete: 'SET NULL', onUpdate: 'CASCADE' });
+// Product.belongsToMany(Job, { through: ProductJob});
 module.exports = Product;

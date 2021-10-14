@@ -4,8 +4,8 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 
-const config = require('./utils/config');
-const connection = require('./db/connection');
+// const config = require('./utils/config');
+// const connection = require('./db/connection');
 
 
 const app = express();
@@ -38,15 +38,6 @@ app.use(multer({
     fileFilter: fileFilter
 }).single('image'));
 
-//load model
-const User = require('./models/user');
-const Job = require('./models/job');
-const UserJob = require('./models/userJob');
-const Category = require('./models/category');
-const Product = require('./models/product');
-const ProductJob = require('./models/productJob');
-const ImageJob = require('./models/imageJob');
-
 //load routing
 const UserRouting = require('./routes/user');
 const JobRouting = require('./routes/job');
@@ -61,28 +52,4 @@ app.use('/api/produk/', ProdukRouting);
 
 app.use('/images', express.static(path.join("images")));
 
-Product.belongsTo(User, { onDelete: 'SET NULL', onUpdate: 'CASCADE' });
-User.hasMany(Product);
-
-ImageJob.belongsTo(Job, { onDelete: 'SET NULL', onUpdate: 'CASCADE' });
-Job.hasMany(ImageJob);
-
-Product.belongsTo(Category, { onDelete: 'SET NULL', onUpdate: 'CASCADE' });
-Category.hasOne(Product);
-
-User.belongsToMany(Job, { through: UserJob });
-Job.belongsToMany(User, { through: UserJob });
-
-Product.belongsToMany(Job, { through: ProductJob});
-Job.belongsToMany(Product, { through: ProductJob });
-
-const port = config.port || 5000;
-app.listen(port, async () => {
-    try {
-        await connection.authenticate();
-        await connection.sync({ force: false });
-        console.log('Connection has been connect in database and server port: ' + port);
-    } catch (error) {
-        console.error('Unable to connect to the database: ', error.message);
-    }
-});
+module.exports = app;

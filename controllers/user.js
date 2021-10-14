@@ -2,10 +2,10 @@ const bcrypt = require('bcryptjs');
 const response = require('../utils/response');
 const message = require('../utils/responseMessage');
 const User = require('../models/user');
-const Job = require('../models/job');
 const jwt = require('jsonwebtoken');
 
-const config = require('../utils/key');
+// const Job = require('../models/job');
+// const config = require('../utils/key');
 
 const getPagination = (page, size) => {
     const limit = size ? +size : 10;
@@ -34,7 +34,7 @@ exports.login = async (req, res, next) => {
         const doMatch = await bcrypt.compare(password, user.password);
         const exp = Math.floor(Date.now() / 1000) + (60 * 60);
         if (doMatch) {
-            const token = jwt.sign({user}, config.secret, {expiresIn: exp});
+            const token = jwt.sign({user}, process.env.secret, {expiresIn: exp});
             const data = {
                 userId: user.id,
                 access_token: token,
@@ -47,7 +47,7 @@ exports.login = async (req, res, next) => {
         }
         return res.status(200).json(response.bad('Invalid Username or Password!'));
     } catch (err) {
-        res.status(400).json(response.bad(err.message));
+        res.status(200).json(response.bad(err.message));
     }
 };
 
@@ -80,7 +80,6 @@ exports.findAllUserId = async (req, res) => {
         res.status(200).json(response.bad(err.message));
     }
 };
-
 
 exports.addUser = async (req, res) => {
     try {

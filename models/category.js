@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const connection = require('../db/connection');
-
 const Category = connection.define('category', {
     name: {
         type: DataTypes.STRING(125),

@@ -50,3 +50,10 @@ exports.nodeFound = (message) => {
         resDesc: message
     }
 }
+
+exports.auth = (message) => {
+    return {
+        resCode: '401',
+        resDesc: message
+    }
+}

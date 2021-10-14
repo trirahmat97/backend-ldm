@@ -1,8 +1,9 @@
 const Sequelize = require('sequelize');
-const config = require('../utils/config');
-const connection = new Sequelize(config.dbname, config.dbusername, config.dbpassword, {
-    host: config.host,
-    dialect: config.dialect,
+// const config = require('../utils/config');
+// const config = process.env;
+const connection = new Sequelize(process.env.dbname, process.env.dbusername, process.env.dbpassword, {
+    host: process.env.host,
+    dialect: process.env.dialect,
     define: {
         timestamps: false
     }

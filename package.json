@@ -4,7 +4,12 @@
   "description": "backend aplikasi ldm lampung",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "env-cmd ./config/dev.env nodemon index.js",
+    "development": "env-cmd ./config/dev.env nodemon index.js",
+    "test": "env-cmd ./config/dev.env jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "repository": {
     "type": "git",
@@ -27,5 +32,10 @@
     "mysql2": "^2.2.5",
     "nodemon": "^2.0.12",
     "sequelize": "^5.22.4"
+  },
+  "devDependencies": {
+    "env-cmd": "^8.0.2",
+    "jest": "^23.6.0",
+    "supertest": "^3.4.1"
   }
 }
